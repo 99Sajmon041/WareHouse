@@ -45,8 +45,8 @@ This project is a web application for managing and tracking materials in the pro
 
 | Role         | Email              | Password  |
 |--------------|--------------------|-----------|
-| SuperAdmin   | admin@admin.cz     | 12345678  |
-| Technician   | technik@projekt.cz | 12345678  |
+| Admin        | admin@admin.cz     | 12345678  |
+| Technician   | need to create     |           |
 
 ## How to Run
 
