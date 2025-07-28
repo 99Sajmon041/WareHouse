@@ -44,7 +44,7 @@ Tato aplikace slouží pro správu a evidenci materiálů ve firmě projekt. Sys
 
 | Role         | Email            | Heslo      |
 |--------------|------------------|------------|
-| SuperAdmin   | admin@admin.cz   | 12345678   |
+| Admin        | admin@admin.cz   | 12345678   |
 | Technik      | nutné vytvořit   |            |
 	
 ## Jak projekt spustit
