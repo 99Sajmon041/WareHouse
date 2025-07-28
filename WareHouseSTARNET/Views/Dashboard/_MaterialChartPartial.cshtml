@@ -1,0 +1,30 @@
+﻿@model WareHouseSTARNET.ViewModels.DashboardViewModels.MaterialChartViewModel
+
+<div class="mb-5">
+    <form method="get" asp-action="Materials" class="d-flex flex-wrap gap-2 justify-content-center align-items-end mb-3">
+        <div class="form-group">
+            <label for="chartPeriod" class="form-label text-danger fw-bold">Období pro graf:</label>
+            <select id="chartPeriod" name="period" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="week" selected="@(Model.SelectedPeriod == "week")">Týden</option>
+                <option value="month" selected="@(Model.SelectedPeriod == "month")">Měsíc</option>
+                <option value="quarter" selected="@(Model.SelectedPeriod == "quarter")">Kvartál</option>
+                <option value="year" selected="@(Model.SelectedPeriod == "year")">Rok</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+@if (Model.ChartData != null && Model.ChartData.Any())
+{
+        <div style="overflow-x: auto; max-width: 100%;">
+            <canvas id="materialChart" style="min-width: 600px; height: 400px;"></canvas>
+        </div>
+}
+else
+{
+        <p class="text-center text-muted mt-4">
+            <i class="bi bi-info-circle"></i>
+            Zatím nejsou dostupná žádná data pro zobrazení grafu.
+        </p>
+}
+

@@ -1,0 +1,23 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build results
+bin/
+obj/
+
+# Rider / JetBrains
+.idea/
+
+# ASP.NET Core config
+appsettings.Development.json
+appsettings.Production.json
+
+# OS
+*.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+.vs/ 

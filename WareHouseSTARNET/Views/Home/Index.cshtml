@@ -1,0 +1,64 @@
+﻿@model List<CriticalMaterialViewModel>
+
+@{
+    ViewData["Title"] = "Domů";
+}
+
+<div class="container">
+    <div class="row align-items-start">
+        <div class="col-md-6 homepage-content">
+            <h1 class="display-5 fw-bold text-danger">STARNET - Sklad</h1>
+            <p class="lead mt-3">
+                Interní webová aplikace společnosti <strong>STARNET, s.r.o.</strong> sloužící k evidenci, správě a odepisování materiálu.
+            </p>
+            <p class="text-muted">
+                Určeno pro administrátory a techniky. Rychlý přehled o dostupném materiálu, jeho typu, stavu a pohybu.
+            </p>
+
+            @if (Model.Any())
+            {
+                <div class="mt-5">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-warning fs-5">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </span>
+                        <h5 class="text-danger fw-bold m-0">Kritické zásoby</h5>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm custom-user-table w-auto">
+                            <thead class="table-danger text-center">
+                                <tr class="align-middle">
+                                    <th class="py-1">@Html.DisplayNameFor(m => m[0].MaterialName)</th>
+                                    <th class="py-1">@Html.DisplayNameFor(m => m[0].Quantity)</th>
+                                    <th class="py-1">@Html.DisplayNameFor(m => m[0].CriticalQuantity)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center align-middle">
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="table-danger">
+                                        <td class="py-2">@item.MaterialName</td>
+                                        <td class="py-2">@item.Quantity</td>
+                                        <td class="py-2">@item.CriticalQuantity</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if(User.IsInRole(Roles.Admin))
+                {
+                    <form asp-action="SendCriticalStockEmail" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-sm btn-danger">Odeslat mail / doplnit zásoby</button>
+                    </form>
+                }
+            }
+        </div>
+
+        <div class="col-md-6 fade-left text-center">
+            <img src="~/images/skladova-technika.jpg" alt="Skladová technika" class="img-fluid rounded shadow-sm" />
+        </div>
+    </div>
+</div>

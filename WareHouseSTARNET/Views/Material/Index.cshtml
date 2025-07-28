@@ -1,0 +1,75 @@
+﻿@model IEnumerable<MaterialViewModel>
+
+@{
+    ViewData["Title"] = "Seznam materiálů";
+    string color = "";
+}
+
+<h2 class="text-start my-4 text-danger">Seznam materiálů</h2>
+
+<div id="materialSection" class="container px-0">
+
+    <div class="mb-3 w-25">
+        <div class="input-group input-group-sm shadow-sm">
+            <span class="input-group-text bg-danger text-white">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" id="searchInput" class="form-control border-danger" placeholder="Hledat materiál..." />
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="materialTable" class="table table-bordered table-hover custom-user-table">
+            <thead class="table-danger text-center">
+                <tr>
+                    <th>Název</th>
+                    <th>Popis</th>
+                    <th>Počet</th>
+                    <th>Kritické množství</th>
+                    <th>Cena za jednotku</th>
+                    <th>Typ materiálu</th>
+                    <th>Obrázek</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody class="text-center align-middle">
+                @foreach (var item in Model)
+                {
+                    color = item.Quantity <= item.CriticalQuantity ? "table-danger" : "table-light";
+
+                    <tr class="@color">
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.CriticalQuantity</td>
+                        <td>@item.UnitPrice.ToString("C")</td>
+                        <td>@item.TypeOfMaterialName</td>
+                        <td class="text-center align-middle">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="Obrázek" style="width: 60px; height: auto;" class="rounded shadow-sm" />
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Bez obrázku</span>
+                            }
+                        </td>
+                        <td style="min-width: 250px;">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-danger me-1">Detail</a>
+                            @if (User.IsInRole(Roles.Admin))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger me-1">Upravit</a>
+                                <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Opravdu chcete smazat materiál: @item.Name?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Smazat</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

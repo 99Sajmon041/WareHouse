@@ -1,0 +1,113 @@
+﻿@model DashboardMaterialsPageViewModel
+
+@{
+    ViewData["Title"] = "Top materiál";
+    var from = Model.TopMaterials.FirstOrDefault()?.DateFrom.ToString("yyyy-MM-dd") ?? "";
+    var to = Model.TopMaterials.FirstOrDefault()?.DateTo.ToString("yyyy-MM-dd") ?? "";
+}
+
+<h2 class="text-center my-4 text-danger">Materiál dle odepisování</h2>
+
+<!-- GRAF část -->
+<div class="mb-5">
+    <form method="get" asp-action="Materials" class="d-flex flex-wrap gap-2 justify-content-center align-items-end mb-3">
+        <div class="form-group">
+            <label for="chartPeriod" class="form-label text-danger fw-bold">Období pro graf:</label>
+            <select id="chartPeriod" name="period" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="week" selected="@(Model.ChartViewModel.SelectedPeriod == "week")">Týden</option>
+                <option value="month" selected="@(Model.ChartViewModel.SelectedPeriod == "month")">Měsíc</option>
+                <option value="quarter" selected="@(Model.ChartViewModel.SelectedPeriod == "quarter")">Kvartál</option>
+                <option value="year" selected="@(Model.ChartViewModel.SelectedPeriod == "year")">Rok</option>
+            </select>
+        </div>
+    </form>
+
+    @if (Model.ChartViewModel.ChartData != null && Model.ChartViewModel.ChartData.Any())
+    {
+        <div style="overflow-x: auto; max-width: 100%;">
+            <canvas id="materialChart" style="min-width: 600px; height: 400px;"></canvas>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted mt-4">
+            <i class="bi bi-info-circle"></i>
+            Zatím nejsou dostupná žádná data pro zobrazení grafu.
+        </p>
+    }
+</div>
+
+<div class="d-flex justify-content-center mb-4">
+    <form asp-action="Materials" method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div class="form-group">
+            <label for="from" class="form-label text-white">Od:</label>
+            <input type="date" name="tableFrom" id="from" value="@from" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="to" class="form-label text-white">Do:</label>
+            <input type="date" name="tableTo" id="to" value="@to" class="form-control form-control-sm" />
+        </div>
+        <button type="submit" class="btn btn-danger btn-sm mt-2">Filtrovat</button>
+    </form>
+</div>
+
+<p class="text-center fw-bold text-danger">
+    Období: @Model.TopMaterials.FirstOrDefault()?.DateFrom.ToShortDateString() – @Model.TopMaterials.FirstOrDefault()?.DateTo.ToShortDateString()
+</p>
+
+<div class="table-responsive">
+    <table class="table custom-user-table mx-auto">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Materiál</th>
+                <th>Typ materiálu</th>
+                <th>Počet odepsaných kusů</th>
+                <th>Top technik</th>
+                <th>Odepsáno technikem</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.TopMaterials != null && Model.TopMaterials.Any())
+            {
+                int index = 1;
+                foreach (var item in Model.TopMaterials)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td>@item.MaterialName</td>
+                        <td>@item.MaterialType</td>
+                        <td>@item.WrittenMaterialCount</td>
+                        <td>@item.TopTechnicianName</td>
+                        <td>@item.TopTechnicianQuantity</td>
+                        <td>
+                            <a asp-action="MaterialDetails" asp-route-id="@item.MaterialId" class="btn btn-danger btn-sm">Detail</a>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">Žádná data k zobrazení.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @if (Model.ChartViewModel.ChartData != null && Model.ChartViewModel.ChartData.Any())
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const chartData = @Html.Raw(Json.Serialize(Model.ChartViewModel.ChartData));
+                if (typeof initMaterialChart === 'function') {
+                    initMaterialChart(chartData);
+                }
+            });
+        </script>
+    }
+}

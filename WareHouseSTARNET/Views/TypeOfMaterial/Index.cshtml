@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TypeOfMaterialViewModel>
+
+@{
+    ViewData["Title"] = "Typy materiálů";
+}
+
+<h2 class="text-center my-4 text-danger">Typy materiálů</h2>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mx-auto custom-user-table">
+            <thead class="table-danger text-center">
+                <tr>
+                    <th>Název typu</th>
+                    <th style="width: 400px;">Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Type</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-danger btn-sm me-1">Detail</a>
+                            @if(User.IsInRole(Roles.Admin))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm me-1">Upravit</a>
+                                <form asp-action="DeleteConfirmed"
+                                      asp-route-id="@item.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Opravdu chcete smazat tento typ: @item.Type?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Smazat</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-center text-muted">Žádné typy materiálů nebyly nalezeny.</p>
+}

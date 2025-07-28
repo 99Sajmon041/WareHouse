@@ -1,0 +1,51 @@
+﻿@model ApplicationUserViewModel
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager
+
+@{
+    ViewData["Title"] = "Detail uživatele";
+    var currentUserId = userManager.GetUserId(User);
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-starnet text-white fw-bold">
+            Detail uživatele
+        </div>
+        <div class="card-body bg-white text-dark">
+            <dl class="row">
+                <dt class="col-sm-3">Celé jméno:</dt>
+                <dd class="col-sm-9">@Model.FullName</dd>
+
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Telefon:</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+                <dt class="col-sm-3">Role:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-danger text-white">@Model.Role</span>
+                </dd>
+
+                <dt class="col-sm-3">Datum narození:</dt>
+                <dd class="col-sm-9">@Model.DateOfBirth.ToString("dd.MM.yyyy")</dd>
+            </dl>
+        </div>
+
+        <div class="card-footer bg-white text-end border-0">
+            @if(User.IsInRole(Roles.Admin))
+            {
+                <a asp-action="Index" class="btn btn-sm btn-outline-danger">Zpět na seznam</a>
+            }
+            else if(User.IsInRole(Roles.User))
+            {
+                <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-danger">Domů</a>
+            }
+
+            @if (Model.Id == currentUserId)
+            {
+                <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-sm btn-danger ms-2">Změnit heslo</a>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,150 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WareHouseSTARNET.Utilities
+@inject UserManager<ApplicationUser> UserManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var curUser = UserManager.GetUserAsync(HttpContextAccessor.HttpContext!.User).Result;
+}
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - STARNET Sklad</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/slate/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-white text-dark">
+
+    <nav class="navbar navbar-expand-lg navbar-custom shadow-sm sticky-top">
+        <div class="container-fluid">
+            <!-- Logo vlevo -->
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo-starnet.png" alt="Logo" class="img-fluid" style="height: 40px; margin-right: 10px;" />
+                <span class="fw-bold">STARNET - Sklad</span>
+            </a>
+
+            <!-- Burger menu -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Obsah navbaru -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Navigace uprostřed -->
+                <ul class="navbar-nav mx-auto gap-2">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")" href="#" data-bs-toggle="dropdown">Statistiky</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Materials">Materiál</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Technicians">Technici</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "ApplicationUser" ? "active" : "")" href="#" data-bs-toggle="dropdown">Uživatelé</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="ApplicationUser" asp-action="Index">Seznam</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ApplicationUser" asp-action="Create">Přidat</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "Material" ? "active" : "")" href="#" data-bs-toggle="dropdown">Materiál</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Material" asp-action="Index">Seznam</a></li>
+                                @if (User.IsInRole(Roles.Admin))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Material" asp-action="Create">Přidat</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Material" asp-action="AddToStock">Naskladnit</a></li>
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "TypeOfMaterial" ? "active" : "")" href="#" data-bs-toggle="dropdown">Typ materiálu</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="TypeOfMaterial" asp-action="Index">Seznam</a></li>
+                                @if (User.IsInRole(Roles.Admin))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="TypeOfMaterial" asp-action="Create">Přidat</a></li>
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "WrittenOffMaterial" ? "active" : "")" href="#" data-bs-toggle="dropdown">Odepsaný materiál</a>
+                            <ul class="dropdown-menu">
+                                @if (User.IsInRole(Roles.Admin))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="WrittenOffMaterial" asp-action="Index">Přehled</a></li>
+                                }
+                                <li><a class="dropdown-item" asp-controller="WrittenOffMaterial" asp-action="Create">Odepsat</a></li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <div class="d-flex align-items-center ms-auto">
+                        <span class="me-3 text-white fw-bold text-shadow">
+                            <a asp-controller="Account" asp-action="Profile" class="text-white text-decoration-none">
+                                Uživatel: @($"{curUser!.FirstName} {curUser.LastName}")
+                            </a>
+                        </span>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-login btn-sm">Odhlásit</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </nav>
+
+
+
+    <main class="container my-4 flex-fill">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div id="state-alert" class="alert alert-starnet-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div id="state-alert" class="alert alert-starnet-error alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="bg-white border-top text-muted py-2 mt-auto">
+        <div class="container d-flex justify-content-between small">
+            <span>@DateTime.Now.ToShortDateString() - STARNET Sklad</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

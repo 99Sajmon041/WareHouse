@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ApplicationUserViewModel>
+
+@{
+    ViewData["Title"] = "Seznam uživatelů";
+    var color = "";
+}
+
+<h2 class="text-center my-4 text-danger">Seznam uživatelů</h2>
+
+<div class="table-responsive">
+    <table class="table custom-user-table mx-auto">
+        <thead>
+            <tr>
+                <th>Jméno</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Datum narození</th>
+                <th>Role</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.DateOfBirth.ToString("dd.MM.yyyy")</td>
+                    <td>
+                        <span class="badge @(color = user.Role == "admin" ? "bg-success" : "bg-info") text-white">@user.Role</span>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-danger btn-sm me-1">Detail</a>
+                        <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-outline-danger btn-sm me-1">Upravit</a>
+
+                        <form asp-action="DeleteConfirmed"
+                              asp-route-id="@user.Id"
+                              method="post"
+                              class="d-inline"
+                              onclick="return confirm('Opravdu chcete smazat tohoto uživatele: @user.FullName?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Smazat</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

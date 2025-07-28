@@ -1,0 +1,78 @@
+﻿@model IEnumerable<WrittenOffMaterialViewModel>
+
+@{
+    ViewData["Title"] = "Odepsaný materiál";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h2 class="text-danger my-4 text-center">Seznam odepsaného materiálu</h2>
+
+        <form method="get" class="mb-4">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label for="date" class="form-label fw-bold">Vyhledat dle data</label>
+                    <div class="input-group">
+                        <input type="date" name="date" id="date" class="form-control form-control-sm" value="@ViewBag.Date" />
+                        <button type="submit" class="btn btn-danger btn-sm">Vyhledat</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <table class="table custom-user-table">
+            <thead style="background-color: #dc143c; color: white;">
+                <tr>
+                    <th style="border-top-left-radius: 12px;">Datum odepsání</th>
+                    <th>Název materiálu</th>
+                    <th>Typ materiálu</th>
+                    <th>Počet</th>
+                    <th>Odepsal</th>
+                    <th style ="border-top-right-radius: 12px;">Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Žádné odepsané položky k zobrazení.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.WritteOfDate.ToString("dd.MM.yyyy")</td>
+                            <td>@item.MaterialName</td>
+                            <td>@item.TypeOfMaterialName</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.ApplicationUser</td>
+                            <td>
+                                <form method="post" asp-controller="WrittenOffMaterial" asp-action="Delete" asp-route-id="@item.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Opravdu chcete odepsaný materiál smazat?');">Smazat</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="btn btn-sm @(i == ViewBag.CurrentPage ? "btn-danger" : "btn-outline-danger") mx-1" asp-action="Index" asp-route-page="@i" asp-route-date="@ViewBag.Date">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

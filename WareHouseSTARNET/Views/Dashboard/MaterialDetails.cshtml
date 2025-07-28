@@ -1,0 +1,124 @@
+﻿@using System.Globalization
+@model MaterialStatsViewModel
+
+@{
+    ViewData["Title"] = "Statistiky materiálu";
+
+    var from = Model?.DateFrom.ToString("yyyy-MM-dd") ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd");
+    var to = Model?.DateTo.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd");
+
+    var stockMax = 100;
+    var statsMax = 1000;
+
+    var stockPercent = Math.Min((double)Model!.StockInPieces / stockMax * 100, 100);
+    var stockBarWidth = $"width: {stockPercent}%";
+}
+
+<h2 class="text-center my-4 text-danger">
+    Statistiky: @(Model?.MaterialName ?? "Neznámý materiál") - @(Model?.TypeOfMaterialName ?? "Nenalezeno")
+</h2>
+
+<div class="d-flex justify-content-center mb-4">
+    <form asp-action="MaterialDetails" method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <input type="hidden" name="id" value="@Context.Request.Query["id"]" />
+        <div class="form-group">
+            <label for="from" class="form-label text-white">Od:</label>
+            <input type="date" name="from" id="from" value="@from" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="to" class="form-label text-white">Do:</label>
+            <input type="date" name="to" id="to" value="@to" class="form-control form-control-sm" />
+        </div>
+        <button type="submit" class="btn btn-danger btn-sm mt-2">Filtrovat</button>
+    </form>
+</div>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger text-center fw-bold">
+        @ViewBag.ErrorMessage
+    </div>
+}
+else
+{
+    <p class="text-center fw-bold text-danger">
+        Období: @Model!.DateFrom.ToShortDateString() – @Model.DateTo.ToShortDateString()
+    </p>
+
+    <div class="table-responsive">
+        <table class="table custom-user-table mx-auto">
+            <thead>
+                <tr>
+                    <th>Popis</th>
+                    <th style="width: 80%;">Hodnota (vizuálně)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Počet kusů skladem</td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-bold text-dark text-nowrap" style="width: 50px;">@Model.StockInPieces ks</span>
+                            <div class="progress-container mx-2" style="width: 100%;">
+                                <div class="progress bg-white">
+                                    @if (Model.StockInPieces > 0)
+                                    {
+                                        string color = Model.IsStateCritical is true ? "bg-danger" : "bg-success";
+                                        <div class="progress-bar @color text-start ps-2 fw-bold"
+                                             role="progressbar" style="@stockBarWidth">
+                                            @Html.Raw("&nbsp;")
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <span class="fw-bold text-danger text-nowrap">@stockMax ks</span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <hr class="bg-danger border-2 border-danger opacity-100" style="height: 4px;" />
+                    </td>
+                </tr>
+
+                @foreach (var item in new[] {
+                        new { Label = "Odepsané kusy (ve zvoleném období)", Value = Model.QuantityOfWrittenPieces },
+                        new { Label = "Odepsání za poslední týden", Value = Model.LastWeekConsumption },
+                        new { Label = "Odepsání za poslední měsíc", Value = Model.LastMonthConsumption },
+                        new { Label = "Odepsání za poslední čtvrt roku", Value = Model.LastQuaterOfYearConsumption },
+                        new { Label = "Odepsání za poslední rok", Value = Model.LastYearConsumption }
+                        })
+                {
+                    var percent = Math.Min(((double)item.Value / statsMax) * 100, 100);
+                    var barWidth = $"width: {percent.ToString("0.##", CultureInfo.InvariantCulture)}%";
+
+                    <tr>
+                        <td>@item.Label</td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="fw-bold text-dark text-nowrap" style="width: 50px;">@item.Value ks</span>
+                                <div class="progress-container mx-2" style="width: 100%;">
+                                    <div class="progress bg-white">
+                                        @if (item.Value > 0)
+                                        {
+                                            <div class="progress-bar bg-warning text-start ps-2 fw-bold"
+                                                 role="progressbar" style="@barWidth">
+                                                @Html.Raw("&nbsp;")
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <span class="fw-bold text-danger text-nowrap">@statsMax ks</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="card-footer bg-white text-center border-0 mt-4">
+    <a asp-action="Materials" class="btn btn-outline-danger btn-sm">Zpět na seznam</a>
+</div>

@@ -1,0 +1,42 @@
+﻿@model MaterialViewModel
+
+@{
+    ViewData["Title"] = "Detail materiálu";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-starnet text-white fw-bold">
+            Detail materiálu
+        </div>
+        <div class="card-body bg-white text-dark">
+            <dl class="row">
+                <dt class="col-sm-4">Název:</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
+
+                <dt class="col-sm-4">Popis:</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+
+                <dt class="col-sm-4">Množství skladem:</dt>
+                <dd class="col-sm-8">@Model.Quantity</dd>
+
+                <dt class="col-sm-4">Kritické množství:</dt>
+                <dd class="col-sm-8">@Model.CriticalQuantity</dd>
+
+                <dt class="col-sm-4">Cena za kus (Kč):</dt>
+                <dd class="col-sm-8">@Model.UnitPrice.ToString("N2")</dd>
+
+                <dt class="col-sm-4">Typ materiálu:</dt>
+                <dd class="col-sm-8">@Model.TypeOfMaterialName</dd>
+
+                <dt class="col-sm-4">Obrázek:</dt>
+                <dd class="col-sm-8">
+                    <img src="@Model.ImageUrl" alt="Foto materiálu" class="img-thumbnail" style="max-height: 200px;" />
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white text-end border-0">
+            <a asp-action="Index" class="btn btn-sm btn-outline-danger">Zpět na seznam</a>
+        </div>
+    </div>
+</div>

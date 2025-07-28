@@ -1,0 +1,102 @@
+﻿@model DashboardTechniciansPageViewModel
+
+@{
+    ViewData["Title"] = "Top technici";
+    var from = Model.TopTechnicinas.FirstOrDefault()?.DateFrom.ToString("yyyy-MM-dd") ?? "";
+    var to = Model.TopTechnicinas.FirstOrDefault()?.DateTo.ToString("yyyy-MM-dd") ?? "";
+}
+
+<h2 class="text-center my-4 text-danger">Technici podle odepsaného materiálu</h2>
+
+<!-- GRAF část -->
+<div class="mb-4">
+    <form method="get" asp-action="Technicians" class="d-flex flex-wrap justify-content-center align-items-end gap-2">
+        <label for="period" class="form-label text-white">Období pro graf:</label>
+        <select name="period" id="period" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+            <option value="week" selected="@(Model.ChartViewModel.SelectedPeriod == "week")">Týden</option>
+            <option value="month" selected="@(Model.ChartViewModel.SelectedPeriod == "month")">Měsíc</option>
+            <option value="quarter" selected="@(Model.ChartViewModel.SelectedPeriod == "quarter")">Kvartál</option>
+            <option value="year" selected="@(Model.ChartViewModel.SelectedPeriod == "year")">Rok</option>
+        </select>
+    </form>
+</div>
+
+@if (Model.ChartViewModel.ChartData.Any())
+{
+    <div style="height: 400px;">
+        <canvas id="technicianChart"></canvas>
+    </div>
+}
+else
+{
+    <p class="text-center text-muted"><i class="bi bi-info-circle"></i> Zatím nejsou data pro zobrazení grafu.</p>
+}
+
+<div class="d-flex justify-content-center mb-4">
+    <form asp-action="Technicians" method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div class="form-group">
+            <label for="from" class="form-label text-white">Od:</label>
+            <input type="date" name="from" id="from" value="@from" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="to" class="form-label text-white">Do:</label>
+            <input type="date" name="to" id="to" value="@to" class="form-control form-control-sm" />
+        </div>
+        <button type="submit" class="btn btn-danger btn-sm mt-2">Filtrovat</button>
+    </form>
+</div>
+
+<p class="text-center fw-bold text-danger">
+    Období: @Model.TopTechnicinas.FirstOrDefault()?.DateFrom.ToShortDateString() – @Model.TopTechnicinas.FirstOrDefault()?.DateTo.ToShortDateString()
+</p>
+
+<div class="table-responsive">
+    <table class="table custom-user-table mx-auto">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Technik</th>
+                <th>Počet odepsaných kusů</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.TopTechnicinas != null && Model.TopTechnicinas.Any())
+            {
+                int index = 1;
+                foreach (var item in Model.TopTechnicinas)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td>@item.TechnicianName</td>
+                        <td>@item.WrittenMaterialCount</td>
+                        <td>
+                            <a asp-action="TechnicianDetails" asp-route-id="@item.TechnicianId" class="btn btn-danger btn-sm">Detail</a>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">Žádná data k zobrazení.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @if (Model.ChartViewModel.ChartData != null && Model.ChartViewModel.ChartData.Any())
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const chartData = @Html.Raw(Json.Serialize(Model.ChartViewModel.ChartData));
+                if (typeof initTechnicianChart === 'function') {
+                    initTechnicianChart(chartData);
+                }
+            });
+        </script>
+    }
+}

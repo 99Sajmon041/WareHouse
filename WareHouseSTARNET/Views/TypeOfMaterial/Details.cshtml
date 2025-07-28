@@ -1,0 +1,23 @@
+﻿@model TypeOfMaterialViewModel
+
+
+@{
+    ViewData["Title"] = "Detail typu materiálu";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-starnet text-white fw-bold">
+            Detail typu materiálu
+        </div>
+        <div class="card-body bg-white text-dark">
+            <dl class="row">
+                <dt class="col-sm-3">Název typu:</dt>
+                <dd class="col-sm-9">@Model.Type</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white text-end border-0">
+            <a asp-action="Index" class="btn btn-sm btn-outline-danger">Zpět na seznam</a>
+        </div>
+    </div>
+</div>
